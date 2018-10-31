@@ -15,6 +15,10 @@ class GildedRose
     !!(@name == item_name)
   end
 
+  def is_conjured_mana_cake?
+    is_item?('Conjured Mana Cake'.freeze)
+  end
+
   def is_aged_brie?
     is_item?('Aged Brie'.freeze)
   end
@@ -59,6 +63,16 @@ class GildedRose
     end
   end
 
+  def update_conjured_mana_cake
+    if @quality > 0
+      if is_sell_date? || should_decay?
+        @quality = @quality - 4
+      else
+        @quality = @quality - 2
+      end
+    end
+  end
+
   def update_generic
     if @quality > 0
       @quality = @quality - 1
@@ -87,6 +101,8 @@ class GildedRose
         update_aged_brie
       elsif is_backstage_passes?
         update_backstage_passes
+      elsif is_conjured_mana_cake?
+        update_conjured_mana_cake
       else
         update_generic
       end
@@ -99,7 +115,8 @@ class GildedRose
         elsif is_backstage_passes?
           decay_backstage_passes
         else
-          decay_generic
+          # 'decay' is (quirkily) handled within the 'update' for conjured mana cake
+          decay_generic if !is_conjured_mana_cake?
         end
       end
     end
